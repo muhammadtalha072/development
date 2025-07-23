@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .form-group.error input,
+        .form-group.error textarea {
+            border-color: #e74c3c;
+            background: #fdf2f2;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .submissions {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e1e5e9;
+        }
+
+        .submissions h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .submission-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4facfe;
+            animation: slideIn 0.3s ease;
+        }
+
+        .submission-item h4 {
+            color: #4facfe;
+            margin-bottom: 5px;
+        }
+
+        .submission-item p {
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        .submission-item .timestamp {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Contact Us</h1>
+            <p>We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+        </div>
+        
+        <div class="form-container">
+            <div class="success-message" id="successMessage">
+                Thank you for your message! We'll get back to you soon.
+            </div>
+            
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your full name">
+                    <div class="error-message" id="nameError">Please enter a valid name (at least 2 characters)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email address">
+                    <div class="error-message" id="emailError">Please enter a valid email address</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">Message *</label>
+                    <textarea id="message" name="message" placeholder="Enter your message here..."></textarea>
+                    <div class="error-message" id="messageError">Please enter a message (at least 10 characters)</div>
+                </div>
+                
+                <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+            
+            <div class="submissions" id="submissions" style="display: none;">
+                <h3>Recent Submissions</h3>
+                <div id="submissionsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Store submissions in memory since localStorage is not available in Claude.ai
+        let formSubmissions = [];
+        
+        // Form elements
+        const contactForm = document.getElementById('contactForm');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const messageInput = document.getElementById('message');
+        const successMessage = document.getElementById('successMessage');
+        const submissionsSection = document.getElementById('submissions');
+        const submissionsList = document.getElementById('submissionsList');
+        
+        // Error elements
+        const nameError = document.getElementById('nameError');
+        const emailError = document.getElementById('emailError');
+        const messageError = document.getElementById('messageError');
+        
+        // Validation functions
+        function validateName(name) {
+            return name.trim().length >= 2 && /^[a-zA-Z\s]+$/.test(name.trim());
+        }
+        
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email.trim());
+        }
+        
+        function validateMessage(message) {
+            return message.trim().length >= 10;
+        }
+        
+        // Show error function
+        function showError(element, errorElement, message) {
+            element.parentElement.classList.add('error');
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+        
+        // Clear error function
+        function clearError(element, errorElement) {
+            element.parentElement.classList.remove('error');
+            errorElement.classList.remove('show');
+        }
+        
+        // Real-time validation
+        nameInput.addEventListener('blur', function() {
+            if (this.value.trim() && !validateName(this.value)) {
+                showError(this, nameError, 'Please enter a valid name (letters only, at least 2 characters)');
+            } else if (this.value.trim()) {
+                clearError(this, nameError);
+            }
+        });
+        
+        emailInput.addEventListener('blur', function() {
+            if (this.value.trim() && !validateEmail(this.value)) {
+                showError(this, emailError, 'Please enter a valid email address');
+            } else if (this.value.trim()) {
+                clearError(this, emailError);
+            }
+        });
+        
+        messageInput.addEventListener('blur', function() {
+            if (this.value.trim() && !validateMessage(this.value)) {
+                showError(this, messageError, 'Please enter a message (at least 10 characters)');
+            } else if (this.value.trim()) {
+                clearError(this, messageError);
+            }
+        });
+        
+        // Clear errors on focus
+        [nameInput, emailInput, messageInput].forEach(input => {
+            input.addEventListener('focus', function() {
+                const errorElement = this.parentElement.querySelector('.error-message');
+                clearError(this, errorElement);
+            });
+        });
+        
+        // Form submission
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let isValid = true;
+            
+            // Validate name
+            if (!nameInput.value.trim()) {
+                showError(nameInput, nameError, 'Name is required');
+                isValid = false;
+            } else if (!validateName(nameInput.value)) {
+                showError(nameInput, nameError, 'Please enter a valid name (letters only, at least 2 characters)');
+                isValid = false;
+            } else {
+                clearError(nameInput, nameError);
+            }
+            
+            // Validate email
+            if (!emailInput.value.trim()) {
+                showError(emailInput, emailError, 'Email is required');
+                isValid = false;
+            } else if (!validateEmail(emailInput.value)) {
+                showError(emailInput, emailError, 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                clearError(emailInput, emailError);
+            }
+            
+            // Validate message
+            if (!messageInput.value.trim()) {
+                showError(messageInput, messageError, 'Message is required');
+                isValid = false;
+            } else if (!validateMessage(messageInput.value)) {
+                showError(messageInput, messageError, 'Please enter a message (at least 10 characters)');
+                isValid = false;
+            } else {
+                clearError(messageInput, messageError);
+            }
+            
+            if (isValid) {
+                // Simulate form submission
+                const submitBtn = contactForm.querySelector('.submit-btn');
+                submitBtn.textContent = 'Sending...';
+                submitBtn.disabled = true;
+                
+                setTimeout(() => {
+                    // Store form data
+                    const formData = {
+                        name: nameInput.value.trim(),
+                        email: emailInput.value.trim(),
+                        message: messageInput.value.trim(),
+                        timestamp: new Date().toLocaleString()
+                    };
+                    
+                    formSubmissions.unshift(formData);
+                    
+                    // Show success message
+                    successMessage.classList.add('show');
+                    
+                    // Reset form
+                    contactForm.reset();
+                    
+                    // Update submissions display
+                    displaySubmissions();
+                    
+                    // Reset button
+                    submitBtn.textContent = 'Send Message';
+                    submitBtn.disabled = false;
+                    
+                    // Hide success message after 5 seconds
+                    setTimeout(() => {
+                        successMessage.classList.remove('show');
+                    }, 5000);
+                    
+                    // Scroll to success message
+                    successMessage.scrollIntoView({ behavior: 'smooth' });
+                    
+                }, 1000);
+            }
+        });
+        
+        // Display submissions function
+        function displaySubmissions() {
+            if (formSubmissions.length === 0) {
+                submissionsSection.style.display = 'none';
+                return;
+            }
+            
+            submissionsSection.style.display = 'block';
+            submissionsList.innerHTML = '';
+            
+            formSubmissions.slice(0, 5).forEach((submission, index) => {
+                const submissionDiv = document.createElement('div');
+                submissionDiv.className = 'submission-item';
+                submissionDiv.innerHTML = `
+                    <h4>${submission.name}</h4>
+                    <p><strong>Email:</strong> ${submission.email}</p>
+                    <p><strong>Message:</strong> ${submission.message}</p>
+                    <p class="timestamp">Submitted: ${submission.timestamp}</p>
+                `;
+                submissionsList.appendChild(submissionDiv);
+            });
+        }
+        
+        // Character counter for message
+        messageInput.addEventListener('input', function() {
+            const charCount = this.value.length;
+            const label = this.parentElement.querySelector('label');
+            if (charCount > 0) {
+                label.textContent = `Message * (${charCount} characters)`;
+            } else {
+                label.textContent = 'Message *';
+            }
+        });
+        
+        // Form auto-save (in memory)
+        let autoSaveData = {};
+        
+        [nameInput, emailInput, messageInput].forEach(input => {
+            input.addEventListener('input', function() {
+                autoSaveData[this.name] = this.value;
+            });
+        });
+        
+        // Restore auto-saved data on page load
+        window.addEventListener('load', function() {
+            Object.keys(autoSaveData).forEach(key => {
+                const element = document.querySelector(`[name="${key}"]`);
+                if (element && autoSaveData[key]) {
+                    element.value = autoSaveData[key];
+                }
+            });
+        });
+    </script>
+</body>
+</html>
