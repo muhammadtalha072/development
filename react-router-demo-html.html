@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Router Demo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Simple Router Implementation
+        const useRouter = () => {
+            const [currentPath, setCurrentPath] = useState(window.location.pathname);
+            const [params, setParams] = useState({});
+
+            useEffect(() => {
+                const handlePopState = () => {
+                    setCurrentPath(window.location.pathname);
+                    parseParams();
+                };
+
+                const parseParams = () => {
+                    const path = window.location.pathname;
+                    const userMatch = path.match(/^\/user\/(.+)$/);
+                    if (userMatch) {
+                        setParams({ username: userMatch[1] });
+                    } else {
+                        setParams({});
+                    }
+                };
+
+                parseParams();
+                window.addEventListener('popstate', handlePopState);
+                return () => window.removeEventListener('popstate', handlePopState);
+            }, []);
+
+            const navigate = (path) => {
+                if (path === -1) {
+                    window.history.back();
+                } else {
+                    window.history.pushState({}, '', path);
+                    setCurrentPath(path);
+                    // Parse params for new path
+                    const userMatch = path.match(/^\/user\/(.+)$/);
+                    if (userMatch) {
+                        setParams({ username: userMatch[1] });
+                    } else {
+                        setParams({});
+                    }
+                }
+            };
+
+            return { currentPath, navigate, params };
+        };
+
+        // Link Component
+        const Link = ({ to, children, className, onClick }) => {
+            const { navigate } = useRouter();
+            
+            const handleClick = (e) => {
+                e.preventDefault();
+                if (onClick) onClick();
+                navigate(to);
+            };
+
+            return React.createElement('a', {
+                href: to,
+                onClick: handleClick,
+                className: className
+            }, children);
+        };
+
+        // Navigation Component
+        const Navigation = () => {
+            return React.createElement('nav', {
+                className: 'bg-gray-800 text-white p-4 shadow-lg'
+            },
+                React.createElement('div', {
+                    className: 'max-w-4xl mx-auto flex justify-between items-center'
+                },
+                    React.createElement(Link, {
+                        to: '/',
+                        className: 'text-xl font-bold hover:text-gray-300'
+                    }, 'React Router Demo'),
+                    React.createElement('div', {
+                        className: 'flex gap-6'
+                    },
+                        React.createElement(Link, {
+                            to: '/',
+                            className: 'hover:text-gray-300 transition-colors'
+                        }, 'Home'),
+                        React.createElement(Link, {
+                            to: '/about',
+                            className: 'hover:text-gray-300 transition-colors'
+                        }, 'About'),
+                        React.createElement(Link, {
+                            to: '/contact',
+                            className: 'hover:text-gray-300 transition-colors'
+                        }, 'Contact')
+                    )
+                )
+            );
+        };
+
+        // Home Component
+        const Home = () => {
+            const { navigate } = useRouter();
+
+            const handleNavigateToAbout = () => {
+                navigate('/about');
+            };
+
+            return React.createElement('div', {
+                className: 'p-8 bg-blue-50 min-h-screen'
+            },
+                React.createElement('div', {
+                    className: 'max-w-4xl mx-auto'
+                },
+                    React.createElement('h1', {
+                        className: 'text-4xl font-bold text-blue-800 mb-6'
+                    }, 'Welcome to Home Page'),
+                    React.createElement('p', {
+                        className: 'text-lg text-gray-700 mb-6'
+                    }, 'This is the home page of our React Router demonstration. Here you can see how routing works with different navigation methods.'),
+                    React.createElement('div', {
+                        className: 'space-y-4'
+                    },
+                        React.createElement('div', null,
+                            React.createElement('h2', {
+                                className: 'text-2xl font-semibold text-blue-700 mb-2'
+                            }, 'Navigation Options:'),
+                            React.createElement('div', {
+                                className: 'flex flex-wrap gap-4'
+                            },
+                                React.createElement(Link, {
+                                    to: '/about',
+                                    className: 'bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-block'
+                                }, 'Go to About (Link)'),
+                                React.createElement('button', {
+                                    onClick: handleNavigateToAbout,
+                                    className: 'bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors'
+                                }, 'Go to About (useNavigate)'),
+                                React.createElement(Link, {
+                                    to: '/contact',
+                                    className: 'bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors inline-block'
+                                }, 'Contact Us')
+                            )
+                        ),
+                        React.createElement('div', {
+                            className: 'mt-8'
+                        },
+                            React.createElement('h3', {
+                                className: 'text-xl font-semibold text-blue-700 mb-2'
+                            }, 'Try Dynamic Routes (useParams):'),
+                            React.createElement('div', {
+                                className: 'flex flex-wrap gap-2'
+                            },
+                                React.createElement(Link, {
+                                    to: '/user/john',
+                                    className: 'text-blue-600 hover:underline mr-4'
+                                }, 'User: John'),
+                                React.createElement(Link, {
+                                    to: '/user/jane',
+                                    className: 'text-blue-600 hover:underline mr-4'
+                                }, 'User: Jane'),
+                                React.createElement(Link, {
+                                    to: '/user/alex',
+                                    className: 'text-blue-600 hover:underline'
+                                }, 'User: Alex')
+                            )
+                        )
+                    )
+                )
+            );
+        };
+
+        // About Component
+        const About = () => {
+            const { navigate } = useRouter();
+
+            return React.createElement('div', {
+                className: 'p-8 bg-green-50 min-h-screen'
+            },
+                React.createElement('div', {
+                    className: 'max-w-4xl mx-auto'
+                },
+                    React.createElement('h1', {
+                        className: 'text-4xl font-bold text-green-800 mb-6'
+                    }, 'About Us'),
+                    React.createElement('div', {
+                        className: 'bg-white p-6 rounded-lg shadow-md mb-6'
+                    },
+                        React.createElement('p', {
+                            className: 'text-lg text-gray-700 mb-4'
+                        }, 'This is the About page where we demonstrate React Router concepts including:'),
+                        React.createElement('ul', {
+                            className: 'list-disc list-inside text-gray-700 space-y-2 mb-6'
+                        },
+                            React.createElement('li', null, React.createElement('strong', null, 'BrowserRouter:'), ' Wraps our entire application'),
+                            React.createElement('li', null, React.createElement('strong', null, 'Routes & Route:'), ' Define our page structure'),
+                            React.createElement('li', null, React.createElement('strong', null, 'Link:'), ' Declarative navigation between pages'),
+                            React.createElement('li', null, React.createElement('strong', null, 'useNavigate:'), ' Programmatic navigation'),
+                            React.createElement('li', null, React.createElement('strong', null, 'useParams:'), ' Access URL parameters')
+                        )
+                    ),
+                    React.createElement('div', {
+                        className: 'flex gap-4'
+                    },
+                        React.createElement('button', {
+                            onClick: () => navigate(-1),
+                            className: 'bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors'
+                        }, 'Go Back'),
+                        React.createElement(Link, {
+                            to: '/contact',
+                            className: 'bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors inline-block'
+                        }, 'Contact Us'),
+                        React.createElement(Link, {
+                            to: '/',
+                            className: 'bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-block'
+                        }, 'Home')
+                    )
+                )
+            );
+        };
+
+        // Contact Component
+        const Contact = () => {
+            const { navigate } = useRouter();
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                alert('Form submitted! Redirecting to home...');
+                navigate('/');
+            };
+
+            return React.createElement('div', {
+                className: 'p-8 bg-purple-50 min-h-screen'
+            },
+                React.createElement('div', {
+                    className: 'max-w-4xl mx-auto'
+                },
+                    React.createElement('h1', {
+                        className: 'text-4xl font-bold text-purple-800 mb-6'
+                    }, 'Contact Us'),
+                    React.createElement('div', {
+                        className: 'bg-white p-6 rounded-lg shadow-md'
+                    },
+                        React.createElement('div', {
+                            className: 'space-y-4'
+                        },
+                            React.createElement('div', null,
+                                React.createElement('label', {
+                                    className: 'block text-sm font-medium text-gray-700 mb-2'
+                                }, 'Name'),
+                                React.createElement('input', {
+                                    type: 'text',
+                                    className: 'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent',
+                                    placeholder: 'Your name'
+                                })
+                            ),
+                            React.createElement('div', null,
+                                React.createElement('label', {
+                                    className: 'block text-sm font-medium text-gray-700 mb-2'
+                                }, 'Email'),
+                                React.createElement('input', {
+                                    type: 'email',
+                                    className: 'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent',
+                                    placeholder: 'your.email@example.com'
+                                })
+                            ),
+                            React.createElement('div', null,
+                                React.createElement('label', {
+                                    className: 'block text-sm font-medium text-gray-700 mb-2'
+                                }, 'Message'),
+                                React.createElement('textarea', {
+                                    rows: 4,
+                                    className: 'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent',
+                                    placeholder: 'Your message here...'
+                                })
+                            ),
+                            React.createElement('div', {
+                                className: 'flex gap-4'
+                            },
+                                React.createElement('button', {
+                                    onClick: handleSubmit,
+                                    className: 'bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors'
+                                }, 'Submit & Go Home'),
+                                React.createElement(Link, {
+                                    to: '/about',
+                                    className: 'bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors inline-block'
+                                }, 'About Us'),
+                                React.createElement(Link, {
+                                    to: '/',
+                                    className: 'bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-block'
+                                }, 'Home')
+                            )
+                        )
+                    )
+                )
+            );
+        };
+
+        // User Profile Component (demonstrates useParams equivalent)
+        const UserProfile = () => {
+            const { navigate, params } = useRouter();
+            const username = params.username || 'Unknown';
+
+            return React.createElement('div', {
+                className: 'p-8 bg-yellow-50 min-h-screen'
+            },
+                React.createElement('div', {
+                    className: 'max-w-4xl mx-auto'
+                },
+                    React.createElement('h1', {
+                        className: 'text-4xl font-bold text-yellow-800 mb-6'
+                    }, 'User Profile'),
+                    React.createElement('div', {
+                        className: 'bg-white p-6 rounded-lg shadow-md mb-6'
+                    },
+                        React.createElement('h2', {
+                            className: 'text-2xl font-semibold text-gray-800 mb-4'
+                        }, `Welcome, ${username}!`),
+                        React.createElement('p', {
+                            className: 'text-gray-700 mb-4'
+                        }, `This page demonstrates the useParams hook. The username "${username}" was extracted from the URL parameter.`),
+                        React.createElement('div', {
+                            className: 'bg-blue-50 p-4 rounded-lg'
+                        },
+                            React.createElement('p', {
+                                className: 'text-sm text-blue-800'
+                            }, [
+                                React.createElement('strong', { key: 'pattern' }, 'URL Pattern: '),
+                                '/user/:username',
+                                React.createElement('br', { key: 'br1' }),
+                                React.createElement('strong', { key: 'current' }, 'Current URL: '),
+                                `/user/${username}`,
+                                React.createElement('br', { key: 'br2' }),
+                                React.createElement('strong', { key: 'extracted' }, 'Extracted Param: '),
+                                `username = "${username}"`
+                            ])
+                        )
+                    ),
+                    React.createElement('div', {
+                        className: 'flex gap-4'
+                    },
+                        React.createElement('button', {
+                            onClick: () => navigate('/'),
+                            className: 'bg-yellow-600 text-white px-6 py-3 rounded-lg hover:bg-yellow-700 transition-colors'
+                        }, 'Back to Home'),
+                        React.createElement('button', {
+                            onClick: () => navigate(-1),
+                            className: 'bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors'
+                        }, 'Go Back')
+                    )
+                )
+            );
+        };
+
+        // 404 Not Found Component
+        const NotFound = () => {
+            const { navigate } = useRouter();
+
+            return React.createElement('div', {
+                className: 'p-8 bg-red-50 min-h-screen'
+            },
+                React.createElement('div', {
+                    className: 'max-w-4xl mx-auto text-center'
+                },
+                    React.createElement('h1', {
+                        className: 'text-6xl font-bold text-red-600 mb-4'
+                    }, '404'),
+                    React.createElement('h2', {
+                        className: 'text-2xl font-semibold text-red-800 mb-4'
+                    }, 'Page Not Found'),
+                    React.createElement('p', {
+                        className: 'text-gray-700 mb-6'
+                    }, "The page you're looking for doesn't exist."),
+                    React.createElement('button', {
+                        onClick: () => navigate('/'),
+                        className: 'bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors'
+                    }, 'Go Home')
+                )
+            );
+        };
+
+        // Router Component
+        const Router = () => {
+            const { currentPath } = useRouter();
+
+            const renderRoute = () => {
+                if (currentPath === '/') return React.createElement(Home);
+                if (currentPath === '/about') return React.createElement(About);
+                if (currentPath === '/contact') return React.createElement(Contact);
+                if (currentPath.startsWith('/user/')) return React.createElement(UserProfile);
+                return React.createElement(NotFound);
+            };
+
+            return React.createElement('div', {
+                className: 'min-h-screen bg-gray-100'
+            },
+                React.createElement(Navigation),
+                renderRoute()
+            );
+        };
+
+        // Main App Component
+        const App = () => {
+            return React.createElement(Router);
+        };
+
+        // Render the app
+        ReactDOM.render(React.createElement(App), document.getElementById('root'));
+    </script>
+</body>
+</html>
